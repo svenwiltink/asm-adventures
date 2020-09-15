@@ -10,50 +10,50 @@ section .text
 global _start
 
 _start:
-	mov rax, 2
-	mov rdi, filename
-	mov rsi, 0
+	mov rax, 2			; open
+	mov rdi, filename		; file
+	mov rsi, 0			; O_RDONLY
 	syscall
 	cmp rax, 0
 	jl .open_failed
-	mov r12, rax
+	mov r12, rax			; store FD in r12
 
 .copy_file:
-	mov rax, 0
-	mov rdi, r12,
-	mov rsi, buffer
-	mov rdx, 512
+	mov rax, 0			; read from
+	mov rdi, r12,			; FD
+	mov rsi, buffer			; into buffer
+	mov rdx, 512			; with a max size of 512
 	syscall
 
-	mov r13, rax
+	mov r13, rax			; store the amount of bytes read into r13
 
-	cmp rax, 0 ;EOF
-	je .exit
+	cmp rax, 0			; check for EOF 
+	je .exit			; exit when done
 
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, buffer,
-	mov rdx, r13
+	mov rax, 1			; write to
+	mov rdi, 1			; stdout
+	mov rsi, buffer,		; the contents of buffer
+	mov rdx, r13			; but only the first r13 bytes
 	syscall
 
-	jmp .copy_file
+	jmp .copy_file			; go again
 
 .open_failed:
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, open_failed
-	mov rdx, 20
+	mov rax, 1			; write
+	mov rdi, 1			; to stdout
+	mov rsi, open_failed		; open_failed
+	mov rdx, 20			; the length of the msg
+	syscall
+	
+	mov rax, 1			; write
+	mov rdi, 1			; to stdout
+	mov rsi, filename		; the filename
+	mov rdx, 14			; the length of the msg
 	syscall
 
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, filename
-	mov rdx, 14
-	syscall
-
-	mov rax, 1
+	mov rax, 1			; set exitcode to 1
 
 .exit:
-	mov rdi, rax
-	mov rax, 60
+	mov rdi, rax			; set exitcode
+	mov rax, 60			; exit
 	syscall
