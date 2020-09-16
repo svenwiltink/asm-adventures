@@ -17,11 +17,6 @@ _start:
 	cmp rax, 2			; check if enough params provided
 	jl .no_file
 
-	;mov rax, 1			; write to
-	;mov rdi, 1			; stdout
-	;mov rdx, 12			; but only the first r13 bytes
-	;syscall
-
 	mov rax, 2			; open
 	mov rdi, [rsp + 16]		; filename located at argv[1]
 	mov rsi, 0			; O_RDONLY
