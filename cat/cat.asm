@@ -13,19 +13,34 @@ section .text
 global _start
 
 _start:
-	mov rax, [rsp]			; load argc
-	cmp rax, 2			; check if enough params provided
+	mov r15, [rsp]			; load argc into r15
+	cmp r15, 2			; check if enough params provided
 	jl .no_file
 
+	mov r14, 2			; store the current arg number in r14
+
+.dump_file:
 	mov rax, 2			; open
-	mov rdi, [rsp + 16]		; filename located at argv[1]
+	mov rdi, [rsp + 8 * r14]	; filename located at argv[1]
 	mov rsi, 0			; O_RDONLY
 	syscall
 
-	cmp rax, 0
-	jl .open_failed
-
 	mov r12, rax			; store FD in r12
+	
+	cmp rax, 0			; failed to open file
+	jle .open_failed		; print error message. open_failed jumps back
+					; so it can print the next file
+	call .copy_file
+
+	mov rax, 3			; close
+	mov rdi, r12			; the file
+
+.dump_inc_file:
+	inc r14				; increment file number
+	cmp r14, r15			; check if we have done all the files
+	jle .dump_file			; and go again if we haven't
+
+	jmp .ok				; all done
 
 .copy_file:
 	mov rax, 0			; read from
@@ -37,7 +52,7 @@ _start:
 	mov r13, rax			; store the amount of bytes read into r13
 
 	cmp rax, 0			; check for EOF
-	je .ok				; exit when done
+	je .copy_done			; exit when done
 
 	mov rax, 1			; write to
 	mov rdi, 1			; stdout
@@ -47,6 +62,10 @@ _start:
 
 	jmp .copy_file			; go again
 
+.copy_done:
+	ret				; all done
+
+; TODO: display what file failed
 .open_failed:
 	mov rax, 1			; write
 	mov rdi, 1			; to stdout
@@ -55,7 +74,7 @@ _start:
 
 	syscall
 	
-	jmp .fail
+	jmp .dump_inc_file
 
 .no_file:
 	mov rax, 1			; write
