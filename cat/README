@@ -1,1 +1,1 @@
-A simple program that dumps the contents of the file provided to stdout. Only a single file is currently supported. When I'm bored I might iterate over argv to print multiple files
+A simple program that dumps the contents of the file provided to stdout. Multiple files can be dumped. When a file can't be found it prints a generic error
