@@ -34,6 +34,7 @@ _start:
 
 	mov rax, 3			; close
 	mov rdi, r12			; the file
+	syscall
 
 .dump_inc_file:
 	inc r14				; increment file number
