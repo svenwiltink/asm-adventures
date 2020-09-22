@@ -38,7 +38,7 @@ _start:
 ; rax will contain the length of the string
 .strlen:
 	mov rdi, rax			; free rax by moving the file to rdi
-	mov rax, 0			; set the counter to 0
+	xor rax, rax 			; set the counter to 0
 	
 .strlen_check:
 	cmp [rdi], byte 0		; check for null byte
