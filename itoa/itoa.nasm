@@ -41,7 +41,6 @@ _start:
 	mov rax, 0			; set the counter to 0
 	
 .strlen_check:
-	mov rsi, [rdi]			; get the byte
 	cmp [rdi], byte 0		; check for null byte
 	jz .strlen_done
 
