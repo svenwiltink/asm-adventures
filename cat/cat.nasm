@@ -72,7 +72,6 @@ _start:
 	mov rdi, 1			; to stdout
 	mov rsi, open_failed		; open_failed
 	mov rdx, open_failed_len	; the length of the msg
-
 	syscall
 	
 	jmp .dump_inc_file
