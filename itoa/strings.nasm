@@ -23,7 +23,7 @@ strlen_check:
 ; into an integer. The result is also placed in rax
 atoi:
 	mov rdi, rax		; save rax 
-    	mov rax, 0              ; Set initial total to 0
+	xor rax, rax            ; Set initial total to 0
      
 atoi_convert:
     	movzx rsi, byte [rdi]   ; Get the current character
