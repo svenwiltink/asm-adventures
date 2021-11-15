@@ -52,11 +52,11 @@ _start:
 
 	mov r13, rax			; store the amount of bytes read into r13
 
-	cmp rax, 0			; check for EOF
+	cmp rax, 0				; check for EOF
 	je .copy_done			; exit when done
 
-	mov rax, 1			; write to
-	mov rdi, 1			; stdout
+	mov rax, 1				; write to
+	mov rdi, 1				; stdout
 	mov rsi, buffer,		; the contents of buffer
 	mov rdx, r13			; but only the first r13 bytes
 	syscall

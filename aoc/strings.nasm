@@ -19,16 +19,33 @@ strlen_check:
 	inc rdi
 	jmp strlen_check
 
-; atoi takes a null terminated string in rax and converts it
-; into an integer. The result is also placed in rax
+; atoi takes a string in rax and converts it into an integer. 
+; if rdi is 0 a null terminated string is used.
+; if rdi is > 0 the string is assumed to be rdi length.
+; The result is also placed in rax
 atoi:
-	mov rdi, rax		; save rax 
+	mov rdx, rdi			; save rdx
+	add rdx, rax			; calculate the end address of the string
+	
+	mov rdi, rax			; save rax 
 	xor rax, rax            ; Set initial total to 0
+
      
 atoi_convert:
     	movzx rsi, byte [rdi]   ; Get the current character
+
+		test rdx, rdx			; null terminated?
+		je .atoi_convert_null_terminated
+
+		cmp rdx, rdi			; check if end of string
+		je done					; done
+		jmp .atoi_convert_calculate
+
+.atoi_convert_null_terminated:
     	test rsi, rsi           ; Check for \0
     	je done
+
+.atoi_convert_calculate:
     
     	cmp rsi, 48             ; Anything less than 0 is invalid
     	jl error
