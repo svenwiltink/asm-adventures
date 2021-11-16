@@ -73,16 +73,20 @@ _start:
     jmp .find_newline                   ; no newline found yet. try the rest of the buffer
 
 .newline_found:
+    mov qword [bufferSize], 512         ; reset buffer
+    sub [bufferSize], rax               ; minus what we've read already
+    sub qword [bufferSize], 1           ; off by one
     mov r15, rax                        ; preserve length of string read
 
     mov rdi, rax                        ; length of the string
     mov rax, buffer                     ; string in the buffer
-    call atoi                           ; convert to string
+    call atoi                           ; convert to int
 
     cmp rax, 0                          ; check for error
     jle .atoi_failed                    ; failed
     
     push rax                            ; push to stack
+    inc r14                             ; increase r14, which holds the amount of numbers parsed
 
 .shift_buffer:
     mov rsi, r15                        ; calculate source address starting with the length of the string
@@ -91,12 +95,49 @@ _start:
     mov rdi, buffer                     ; target address
     mov rcx, 512                        ; how many bytes to copy
     sub rcx, r15                        ; minus the data already read
-    sub rcx, 2                          ; offset by two to account for off-by one
+    sub rcx, 1                          ; offset by two to account for off-by one
     rep movsb                           ; keep moving data
 
     jmp .fill_buffer                    ; this number is done. Fill the buffer and try it all again.
 
+
+; rax - upper bounds
+; rcx - a index
+; rdx - a value
+; rsi - b index
+; rdi - b value
 .process_numbers:
+    mov rax, 8                          ; start calculating the start of the stack. Each entry is 64 bit
+    mul r14                             ; there are r14 entries
+    add rax, rsp                        ; rax is now the upper bounds of the stack
+
+    mov rcx, rsp                        ; start with the lower bound of the stack
+.get_number_a:
+    mov rdx, [rcx]
+    
+    mov rsi, rsp                        ; start with lower bound of the stack
+.get_number_b:
+    mov rdi, [rsi]
+
+    ; check of both numbers add up to 2020
+    add rdi, rdx
+    cmp rdi, 2020
+    je .processing_done
+
+    add rsi, 8                          ; increment with 64 bits
+    cmp rsi, rax                        ; check if upperbound met
+    jne .get_number_b
+
+.increment_number_a:
+    add rcx, 8                          ; increment with 64 bits
+    cmp rcx, rax                        ; check if upperbound met
+    je .fail                            ; we are done and should have a match by now
+    jmp .get_number_a
+
+.processing_done:
+    mov rax, [rsi]                      ; restore b value
+    mul rdx                             ; multiply by a
+.part1_answer:
     jmp .ok
 
 ; exit conditions and error messages below this point
