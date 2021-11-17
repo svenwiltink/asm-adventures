@@ -1,5 +1,7 @@
 extern strlen
 extern atoi
+extern itoa
+extern intlen
 
 section .bss
 buffer           resb 512  ; buffer for reading the inputfile
@@ -31,6 +33,7 @@ _start:
 
     mov rax, [rsp + 16]                 ; get the inputfile 
     mov [inputfileName], rax            ; and store in in inputfile
+.itoa_done:       
 
 ; open file
     mov rax, 2                          ; open
@@ -137,8 +140,31 @@ _start:
 .processing_done:
     mov rax, [rsi]                      ; restore b value
     mul rdx                             ; multiply by a
+
 .part1_answer:
+    mov r15, rax
+    
+    call intlen                         ; calculate length of string when displayed on screen
+
+    mov r14, rax                        ; save strlen
+
+    mov rax, 1                          ; start allocating space for the string
+    mul r14                             ; by using strlen bytes
+    sub rsp, rax                        ; move stack pointer, reserving the bytes
+
+    mov rax, r15
+    mov rdi, rsp                        ; the location of memory
+    call itoa                           ; fill buffer with solution
+
+.print:
+    mov rax, 1                          ; write
+    mov rdi, 2                          ; to stdout
+    mov rsi, rsp                        ; answer
+    mov rdx, r14                        ; the length of the msg
+    syscall
+
     jmp .ok
+
 
 ; exit conditions and error messages below this point
 .no_file:
