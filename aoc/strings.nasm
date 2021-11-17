@@ -34,7 +34,7 @@ intlen:
     jl .intlen_done         ; done
 
     xor	rdx,	rdx         ; clear remainder
-    div rcx                ; devide by 10
+    div rcx                 ; devide by 10
     inc rdi                 ; increment digits required
     jmp .intlen_devide
 
@@ -65,7 +65,7 @@ itoa:
     mov [rdi], dl           ; write lower byte of remainder to buffer
     dec rdi                 ; move pointer
 
-    cmp rax, 0             ; check if done
+    cmp rax, 0              ; check if done
     jne .itoa_devide
 
     ret
@@ -83,32 +83,32 @@ atoi:
 
      
 atoi_convert:
-        movzx rsi, byte [rdi]   ; Get the current character
+        movzx rsi, byte [rdi]               ; Get the current character
 
-        test rdx, rdx            ; null terminated?
+        test rdx, rdx                       ; null terminated?
         je .atoi_convert_null_terminated
 
-        cmp rdx, rdi            ; check if end of string
-        je done                    ; done
+        cmp rdx, rdi                        ; check if end of string
+        je done                             ; done
         jmp .atoi_convert_calculate
 
 .atoi_convert_null_terminated:
-        test rsi, rsi           ; Check for \0
+        test rsi, rsi                       ; Check for \0
         je done
 
 .atoi_convert_calculate:
     
-        cmp rsi, 48             ; Anything less than 0 is invalid
+        cmp rsi, 48                         ; Anything less than 0 is invalid
         jl error
     
-        cmp rsi, 57             ; Anything greater than 9 is invalid
+        cmp rsi, 57                         ; Anything greater than 9 is invalid
         jg error
      
-        sub rsi, 48             ; Convert from ASCII to decimal 
-        imul rax, 10            ; Multiply total by 10
-        add rax, rsi            ; Add current digit to total
+        sub rsi, 48                         ; Convert from ASCII to decimal
+        imul rax, 10                        ; Multiply total by 10
+        add rax, rsi                        ; Add current digit to total
     
-        inc rdi                 ; Get the address of the next character
+        inc rdi                             ; Get the address of the next character
         jmp atoi_convert
 
 error:
